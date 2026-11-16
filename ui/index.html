@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Drivers</title>
+  <link rel="stylesheet" href="css/vega.css">
+  <link rel="stylesheet" href="css/driver.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <svg width="0" height="0" class="sprite" aria-hidden="true">
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11 12 4l8 7v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11m-4.5-4.5L12 15l4.5-4.5M5 19h14"/></symbol>
+    <symbol id="i-pulse" viewBox="0 0 24 24"><path d="M3 12h4l2.5-6 5 12 2.5-6h4"/></symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M5 6h9m4 0h1M5 12h3m4 0h7M5 18h11m4 0h-1"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7"/><circle cx="12" cy="17" r=".6"/></symbol>
+    <symbol id="i-gpu" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="10" rx="1.5"/><circle cx="9" cy="12" r="2.5"/><path d="M14 10.5h4m-4 3h4M6 17v2.5m4-2.5v2.5"/></symbol>
+    <symbol id="i-wifi" viewBox="0 0 24 24"><path d="M3.5 9.5a12 12 0 0 1 17 0M6.5 12.5a7.5 7.5 0 0 1 11 0M9.5 15.5a3.3 3.3 0 0 1 5 0"/><circle cx="12" cy="18.5" r=".8"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4.5"/><circle cx="12" cy="17" r=".6"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="m6.5 6.5 11 11m0-11-11 11"/></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24"><path d="M6 12h12"/></symbol>
+    <symbol id="i-max" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1.5"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3.5 5 6v5.5c0 4.3 3 7.6 7 9 4-1.4 7-4.7 7-9V6z"/><path d="m9 12 2.2 2.2L15.5 10"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.2"/></symbol>
+    <symbol id="i-restart" viewBox="0 0 24 24"><path d="M5 12a7 7 0 1 0 2.1-5"/><path d="M5 4v4h4"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M5 7h14m-9 0V5h4v2m-7 0 .8 12h8.4L17 7"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M19 12a7 7 0 0 1-12 4.9M5 12a7 7 0 0 1 12-4.9"/><path d="M17 3.5v3.6h-3.6M7 20.5v-3.6h3.6"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="m15.5 15.5 4 4"/></symbol>
+    <symbol id="i-terminal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="1.5"/><path d="m7 10 2.5 2L7 14m4.5 0H16"/></symbol>
+    <symbol id="i-cpu" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/><rect x="9.5" y="9.5" width="5" height="5" rx=".5"/><path d="M9 3v3m6-3v3M9 18v3m6-3v3M3 9h3m-3 6h3m12-6h3m-3 6h3"/></symbol>
+  </svg>
+
+  <div class="window">
+    <aside class="sidebar">
+      <header class="sidebar-header" data-drag>
+        <div class="brand" data-drag><span class="brand-mark"><svg class="i sm"><use href="#i-gpu"/></svg></span><span data-drag>Drivers</span></div>
+      </header>
+      <nav class="nav" aria-label="Seções">
+        <div class="nav-group">
+          <div class="nav-group-title">Dispositivos</div>
+          <a class="nav-item" href="#inicio" data-page="inicio"><span class="ic"><svg class="i"><use href="#i-home"/></svg></span>Visão geral<span class="count" id="nav-count" hidden>1</span></a>
+        </div>
+        <div class="nav-group">
+          <div class="nav-group-title">NVIDIA</div>
+          <a class="nav-item" href="#instalar" data-page="instalar"><span class="ic"><svg class="i"><use href="#i-download"/></svg></span>Instalar</a>
+          <a class="nav-item" href="#teste" data-page="teste"><span class="ic"><svg class="i"><use href="#i-pulse"/></svg></span>Teste</a>
+          <a class="nav-item" href="#gerenciar" data-page="gerenciar"><span class="ic"><svg class="i"><use href="#i-sliders"/></svg></span>Gerenciar</a>
+        </div>
+        <div class="nav-group">
+          <div class="nav-group-title">Ajuda</div>
+          <a class="nav-item" href="#problemas" data-page="problemas"><span class="ic"><svg class="i"><use href="#i-help"/></svg></span>Problemas conhecidos</a>
+        </div>
+      </nav>
+      <footer class="sidebar-footer">
+        <div class="host-chip">
+          <span class="host-avatar"><svg class="i"><use href="#i-cpu"/></svg></span>
+          <span class="host-meta"><strong id="host-name">…</strong><small><i class="status-dot" id="host-dot"></i><span id="host-status">Verificando…</span></small></span>
+        </div>
+      </footer>
+    </aside>
+
+    <main class="content">
+      <header class="headerbar" id="headerbar" data-drag>
+        <div class="title-wrap" data-drag><h1 id="page-title" data-drag></h1><span class="crumb" id="page-crumb" data-drag></span></div>
+        <div class="header-actions">
+          <button class="icon-btn" id="rescan" title="Verificar dispositivos de novo" aria-label="Verificar de novo"><svg class="i"><use href="#i-refresh"/></svg></button>
+        </div>
+        <div class="window-controls">
+          <button class="wc" data-wc="min" aria-label="Minimizar" title="Minimizar"><svg class="i xs"><use href="#i-minus"/></svg></button>
+          <button class="wc" data-wc="max" aria-label="Maximizar" title="Maximizar"><svg class="i xs"><use href="#i-max"/></svg></button>
+          <button class="wc" data-wc="close" aria-label="Fechar" title="Fechar"><svg class="i xs"><use href="#i-x"/></svg></button>
+        </div>
+      </header>
+
+      <div class="scroller" id="scroller">
+
+        <!-- ============ Visão geral ============ -->
+        <div class="page" id="inicio" data-title="Visão geral">
+          <div id="home-hero"></div>
+          <div id="home-groups"></div>
+          <div class="section">
+            <div class="list">
+              <button class="list-row" data-expand="tech-home" aria-expanded="false">
+                <span class="lead"><svg class="i"><use href="#i-terminal"/></svg></span>
+                <span class="body"><span class="title">Detalhes técnicos</span><span class="subtitle">Saída do lspci -nn</span></span>
+                <svg class="i chev"><use href="#i-chevron"/></svg>
+              </button>
+              <div class="list-detail" id="tech-home" hidden><div class="job-log" id="lspci"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ Instalar ============ -->
+        <div class="page" id="instalar" data-title="Instalar" hidden>
+          <div class="page-hero">
+            <div>
+              <h2>Instalar driver NVIDIA</h2>
+              <p id="install-sub"></p>
+            </div>
+            <div class="stage-steps" aria-label="Etapas">
+              <span data-stage="review">Revisar</span><span data-stage="progress">Instalar</span><span data-stage="done">Reiniciar</span>
+            </div>
+          </div>
+
+          <div class="stage" data-stage="review">
+            <div class="section-head"><h3>O que vai acontecer</h3></div>
+            <div class="list">
+              <div class="list-row"><span class="lead tint"><svg class="i"><use href="#i-camera"/></svg></span>
+                <span class="body"><span class="title">Ponto de restauração antes de tudo</span><span class="subtitle wrap">Um instantâneo do Snapper permite voltar ao estado atual pelo GRUB.</span></span></div>
+              <div class="list-row"><span class="lead tint"><svg class="i"><use href="#i-shield"/></svg></span>
+                <span class="body"><span class="title">Repositório oficial e chave conferida</span><span class="subtitle wrap">A impressão digital da chave da NVIDIA (2FB0 3195 … DB27 FD5A) é verificada antes de confiar nela.</span></span></div>
+              <div class="list-row"><span class="lead tint"><svg class="i"><use href="#i-download"/></svg></span>
+                <span class="body"><span class="title" id="install-pkg-title">Instalar o driver</span><span class="subtitle wrap mono" id="install-pkg"></span></span></div>
+              <div class="list-row"><span class="lead tint"><svg class="i"><use href="#i-restart"/></svg></span>
+                <span class="body"><span class="title">Um reinício no final</span><span class="subtitle wrap">Depois dele, o teste abre sozinho e confirma que o driver está em uso.</span></span></div>
+            </div>
+            <div id="install-notes"></div>
+            <div class="row-flex end">
+              <a class="btn flat" href="#inicio">Cancelar</a>
+              <button class="btn primary pill" id="install-start">Instalar</button>
+            </div>
+          </div>
+
+          <div class="stage" data-stage="progress" hidden>
+            <div class="card pad progress-card">
+              <div class="row-flex">
+                <span class="spinner" id="progress-spinner"></span>
+                <strong id="progress-title">Aguardando autorização…</strong>
+                <span class="spacer"></span>
+                <span class="faint small mono" id="progress-pct"></span>
+              </div>
+              <div class="meter lg" id="progress-meter"><i id="progress-bar"></i></div>
+              <span class="faint small" id="progress-hint">Digite a senha de administrador na janela que abrir.</span>
+            </div>
+            <div id="action-error"></div>
+            <div class="list">
+              <div id="action-steps"></div>
+              <button class="list-row" data-expand="action-log-wrap" aria-expanded="false">
+                <span class="lead"><svg class="i"><use href="#i-terminal"/></svg></span>
+                <span class="body"><span class="title">Detalhes técnicos</span></span>
+                <svg class="i chev"><use href="#i-chevron"/></svg>
+              </button>
+              <div class="list-detail" id="action-log-wrap" hidden><div class="job-log" id="action-log"></div></div>
+            </div>
+            <div class="row-flex end" id="action-retry" hidden>
+              <a class="btn flat" href="#problemas">Problemas conhecidos</a>
+              <button class="btn" id="action-back">Voltar</button>
+            </div>
+          </div>
+
+          <div class="stage" data-stage="done" hidden>
+            <div class="empty">
+              <div class="art green"><svg class="i xl"><use href="#i-check"/></svg></div>
+              <h3 id="done-title">Driver instalado</h3>
+              <p id="done-text">Reinicie para começar a usar. Depois do login, o teste abre sozinho.</p>
+              <div class="row-flex">
+                <button class="btn flat" id="install-later">Reiniciar depois</button>
+                <button class="btn primary pill" id="install-reboot"><svg class="i"><use href="#i-restart"/></svg>Reiniciar agora</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ Teste ============ -->
+        <div class="page" id="teste" data-title="Teste" data-crumb="Driver NVIDIA em uso?" hidden>
+          <div class="page-hero">
+            <div>
+              <h2>Teste do driver</h2>
+              <p>Abre sozinho no primeiro login depois da instalação. Dá para repetir quando quiser.</p>
+            </div>
+          </div>
+          <div class="banner" id="test-banner">
+            <span class="ic" id="test-ic"><span class="spinner"></span></span>
+            <div class="body"><strong id="test-title">Testando…</strong><span id="test-text"></span></div>
+            <button class="btn" id="test-again"><svg class="i"><use href="#i-refresh"/></svg>Testar de novo</button>
+          </div>
+          <div class="section">
+            <div class="section-head"><h3>Verificações</h3></div>
+            <div class="list" id="checks"></div>
+          </div>
+          <div class="section" id="test-fix" hidden>
+            <div class="section-head"><h3>O que fazer</h3></div>
+            <div class="list">
+              <a class="list-row clickable" href="#gerenciar"><span class="lead tint"><svg class="i"><use href="#i-refresh"/></svg></span>
+                <span class="body"><span class="title">1. Reinstalar o driver</span><span class="subtitle wrap">Resolve a maioria dos casos depois de um kernel novo.</span></span><svg class="i chev"><use href="#i-chevron"/></svg></a>
+              <div class="list-row"><span class="lead tint"><svg class="i"><use href="#i-camera"/></svg></span>
+                <span class="body"><span class="title">2. Voltar ao ponto de restauração</span><span class="subtitle wrap">“antes do driver NVIDIA”, no Vega, em Pontos de restauração.</span></span></div>
+              <a class="list-row clickable" href="#problemas"><span class="lead"><svg class="i"><use href="#i-help"/></svg></span>
+                <span class="body"><span class="title">Ver problemas conhecidos</span></span><svg class="i chev"><use href="#i-chevron"/></svg></a>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ Gerenciar ============ -->
+        <div class="page" id="gerenciar" data-title="Gerenciar" hidden>
+          <div class="page-hero">
+            <div>
+              <h2 id="manage-title">Driver NVIDIA</h2>
+              <p>As atualizações normais chegam pelo Zypper com o resto do sistema.</p>
+            </div>
+          </div>
+          <div id="manage-empty" class="empty" hidden>
+            <div class="art"><svg class="i xl"><use href="#i-gpu"/></svg></div>
+            <h3>Nenhum driver NVIDIA instalado</h3>
+            <p id="manage-empty-text"></p>
+            <a class="btn primary pill" href="#instalar" id="manage-empty-btn">Instalar driver</a>
+          </div>
+          <div id="manage-body">
+            <div class="grid c3">
+              <div class="card stat"><div class="stat-head">Versão instalada</div><div class="stat-value" id="m-version"></div><div class="stat-foot" id="m-loaded"></div></div>
+              <div class="card stat"><div class="stat-head">Ramo</div><div class="stat-value" id="m-branch"></div><div class="stat-foot" id="m-branch-foot"></div></div>
+              <div class="card stat"><div class="stat-head">Secure Boot</div><div class="stat-value" id="m-sb"></div><div class="stat-foot" id="m-sb-foot"></div></div>
+            </div>
+            <div class="section">
+              <div class="section-head"><h3>Ações</h3></div>
+              <div class="list">
+                <div class="list-row"><span class="lead tint"><svg class="i"><use href="#i-download"/></svg></span>
+                  <span class="body"><span class="title">Atualizar</span><span class="subtitle wrap">Procura e instala uma versão nova no repositório da NVIDIA, sem esperar a atualização do sistema.</span></span>
+                  <button class="btn" data-confirm="update">Atualizar</button></div>
+                <div class="list-row"><span class="lead tint"><svg class="i"><use href="#i-refresh"/></svg></span>
+                  <span class="body"><span class="title">Reinstalar</span><span class="subtitle wrap">Instala os mesmos pacotes de novo. Útil quando um kernel novo não carregou o driver.</span></span>
+                  <button class="btn" data-confirm="reinstall">Reinstalar</button></div>
+                <div class="list-row"><span class="lead tint"><svg class="i"><use href="#i-pulse"/></svg></span>
+                  <span class="body"><span class="title">Testar agora</span><span class="subtitle">Repete as verificações sem reiniciar.</span></span>
+                  <a class="btn" href="#teste">Testar</a></div>
+                <div class="list-row"><span class="lead tint"><svg class="i"><use href="#i-camera"/></svg></span>
+                  <span class="body"><span class="title">Pontos de restauração</span><span class="subtitle wrap">Cada ação cria um “antes do driver NVIDIA”. Para voltar, use o Vega ou o menu do GRUB.</span></span></div>
+              </div>
+            </div>
+            <div class="section">
+              <div class="section-head"><h3 class="danger-text">Zona de risco</h3></div>
+              <div class="list">
+                <div class="list-row"><span class="lead red"><svg class="i"><use href="#i-trash"/></svg></span>
+                  <span class="body"><span class="title">Remover driver</span><span class="subtitle wrap">Volta ao driver livre nouveau e remove o repositório da NVIDIA.</span></span>
+                  <button class="btn danger-soft" data-confirm="remove">Remover</button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ Problemas ============ -->
+        <div class="page" id="problemas" data-title="Problemas conhecidos" data-crumb="NVIDIA" hidden>
+          <div class="page-hero">
+            <div>
+              <h2>Problemas conhecidos</h2>
+              <p>Casos já vistos no fórum, com a saída recomendada.</p>
+            </div>
+            <label class="input-icon search-box">
+              <span class="ic"><svg class="i"><use href="#i-search"/></svg></span>
+              <input class="input" type="search" id="issue-search" placeholder="Buscar sintoma">
+            </label>
+          </div>
+          <div class="list" id="issues">
+            <button class="list-row issue" data-expand="p1" aria-expanded="true"><span class="lead red"><svg class="i"><use href="#i-alert"/></svg></span>
+              <span class="body"><span class="title">Tela preta depois de instalar</span></span><svg class="i chev"><use href="#i-chevron"/></svg></button>
+            <div class="list-detail" id="p1">
+              <ol><li>No menu do GRUB, abra <em>Start bootloader from a read-only snapshot</em>.</li><li>Escolha “antes do driver NVIDIA” e entre normalmente.</li><li>Faça o rollback pelo Vega, em Pontos de restauração, e reinicie.</li></ol>
+            </div>
+            <button class="list-row issue" data-expand="p2" aria-expanded="false"><span class="lead yellow"><svg class="i"><use href="#i-shield"/></svg></span>
+              <span class="body"><span class="title">Secure Boot e o driver G06</span></span><svg class="i chev"><use href="#i-chevron"/></svg></button>
+            <div class="list-detail" id="p2" hidden>
+              <p>O driver G07 (Turing e mais novas) vem assinado pelo openSUSE e funciona com o Secure Boot ligado. O G06 (Maxwell, Pascal e Volta) registraria a chave no MOK com a senha de root, que é bloqueada no Lyra OS. Por isso o app não instala o G06 com o Secure Boot ligado: desligue-o no firmware antes.</p>
+            </div>
+            <button class="list-row issue" data-expand="p3" aria-expanded="false"><span class="lead"><svg class="i"><use href="#i-gpu"/></svg></span>
+              <span class="body"><span class="title">Placa antiga (Kepler ou anterior)</span></span><svg class="i chev"><use href="#i-chevron"/></svg></button>
+            <div class="list-detail" id="p3" hidden><p>Não há driver NVIDIA para essas placas no Leap 16.1. Elas continuam com o driver livre nouveau, que já vem no sistema.</p></div>
+            <button class="list-row issue" data-expand="p4" aria-expanded="false"><span class="lead"><svg class="i"><use href="#i-gpu"/></svg></span>
+              <span class="body"><span class="title">Notebook com duas placas de vídeo (Optimus)</span></span><svg class="i chev"><use href="#i-chevron"/></svg></button>
+            <div class="list-detail" id="p4" hidden><p>A placa integrada continua desenhando a área de trabalho, para poupar bateria. Para abrir um app na NVIDIA, clique com o botão direito no ícone e escolha <em>Iniciar usando a placa de vídeo dedicada</em>. Em placas anteriores à Ampere, a instalação liga o gerenciamento de energia dinâmico (<span class="mono">NVreg_DynamicPowerManagement=0x02</span>).</p></div>
+            <button class="list-row issue" data-expand="p5" aria-expanded="false"><span class="lead"><svg class="i"><use href="#i-refresh"/></svg></span>
+              <span class="body"><span class="title">Kernel novo sem o driver</span></span><svg class="i chev"><use href="#i-chevron"/></svg></button>
+            <div class="list-detail" id="p5" hidden>
+              <p>Reinstale o driver. Se não resolver, escolha o kernel anterior no GRUB e avise no fórum.</p>
+              <a class="btn sm" href="#gerenciar">Ir para Gerenciar</a>
+            </div>
+            <button class="list-row issue" data-expand="p6" aria-expanded="false"><span class="lead"><svg class="i"><use href="#i-sliders"/></svg></span>
+              <span class="body"><span class="title">Instalei o driver pelo Vega antigo</span></span><svg class="i chev"><use href="#i-chevron"/></svg></button>
+            <div class="list-detail" id="p6" hidden><p>O pacote lyra-nvidia foi descontinuado. A instalação aqui faz a migração numa única transação: remove o lyra-nvidia e o repositório antigo e instala o driver do guia.</p></div>
+          </div>
+          <div class="empty" id="issues-empty" hidden>
+            <div class="art"><svg class="i xl"><use href="#i-search"/></svg></div>
+            <h3>Nada encontrado</h3>
+            <p>Pergunte no fórum do Lyra OS.</p>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <div class="overlay" id="confirm" hidden>
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+      <div class="dialog-body">
+        <div class="d-ic" id="confirm-ic"><svg class="i lg"><use href="#i-alert"/></svg></div>
+        <h2 id="confirm-title">Confirmar</h2>
+        <p id="confirm-text"></p>
+      </div>
+      <div class="dialog-actions">
+        <button class="btn" data-close>Cancelar</button>
+        <button class="btn primary" id="confirm-ok">Continuar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+</body>
+</html>
