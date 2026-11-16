@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Lyra Driver: teste após reiniciar
+Comment=Abre o teste do driver quando há um pendente
+Exec=lyra-driver --check-pending
+NoDisplay=true
+X-GNOME-Autostart-enabled=true

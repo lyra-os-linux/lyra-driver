@@ -1,0 +1,248 @@
+#!/bin/bash
+# lyra-driver-helper: ações privilegiadas do Lyra Driver, chamadas por
+#   pkexec /usr/libexec/lyra-driver/lyra-driver-helper <ação>
+# Autorização: polkit, ação org.lyraos.driver.manage (data/org.lyraos.driver.policy).
+#
+# Segue o guia do fórum (Discussions #234 e #366): repositório gráfico oficial
+# da NVIDIA adicionado direto (sem openSUSE-repos-Leap-NVIDIA), chave conferida
+# antes de confiar nela e o metapacote certo para a placa. O helper detecta a
+# placa sozinho e só aceita a lista fechada de ações abaixo; a interface não
+# escolhe pacote nem repositório.
+#
+# Saída para a interface, uma por linha:
+#   @step <n> <título>   início da etapa n
+#   @done                tudo certo
+#   @error <mensagem>    falhou (código de saída diferente de zero)
+# As demais linhas são o log técnico.
+#
+# Códigos de saída: 0 ok; 2 uso inválido; 3 recusado pelas regras; 4 sem root;
+# 5 chave da NVIDIA não confere; 1 falha do zypper ou do sistema.
+
+set -Eeuo pipefail
+export LC_ALL=C PATH=/usr/sbin:/usr/bin:/sbin:/bin
+
+readonly REPO_ALIAS="repo-nvidia"
+readonly REPO_URL="https://download.nvidia.com/opensuse/leap/16.1"
+readonly KEY_FINGERPRINT="2FB03195DECD49492BD1C17AB1D0D788DB27FD5A"
+readonly G07="nvidia-open-driver-G07-signed-kmp-meta"
+readonly G06="nvidia-driver-G06-kmp-meta"
+readonly PM_CONF="/etc/modprobe.d/60-lyra-nvidia-pm.conf"
+readonly STATE_DIR="/var/lib/lyra-driver"
+readonly PENDING_TEST="$STATE_DIR/pending-test"
+readonly ZYPPER=(zypper --non-interactive --no-color)
+
+step() { printf '@step %s %s\n' "$1" "$2"; }
+fail() { printf '@error %s\n' "$2"; exit "$1"; }
+
+usage() {
+  echo "uso: lyra-driver-helper {install|update|reinstall|remove|plan}" >&2
+  exit 2
+}
+
+# ---------- Detecção (mesma tabela de src-tauri/src/detect.rs) ----------
+
+lspci_out() {
+  # Só fora do root, para os testes: com pkexec o ambiente é limpo.
+  if [[ $EUID -ne 0 && -n "${LYRA_DRIVER_LSPCI_FILE:-}" ]]; then
+    cat -- "$LYRA_DRIVER_LSPCI_FILE"
+  else
+    lspci -nn
+  fi
+}
+
+# Imprime "<geração> <chip> <3d|vga>"; geração: g07, g06, legacy ou none.
+detect() {
+  local line chip kind
+  line=$(lspci_out | grep -E 'NVIDIA Corporation' | grep -E 'VGA compatible controller|3D controller|Display controller' | head -n1 || true)
+  if [[ -z $line ]]; then
+    echo "none - -"
+    return
+  fi
+  chip=$(sed -E 's/.*NVIDIA Corporation ([A-Z]{2}[0-9][0-9A-Za-z]*).*/\1/' <<<"$line")
+  [[ $line == *"3D controller"* ]] && kind=3d || kind=vga
+  case ${chip:0:2} in
+    TU | GA | AD | GH | GB) echo "g07 $chip $kind" ;;
+    GM | GP | GV) echo "g06 $chip $kind" ;;
+    *) echo "legacy $chip $kind" ;;
+  esac
+}
+
+secure_boot() {
+  local var
+  var=$(compgen -G '/sys/firmware/efi/efivars/SecureBoot-*' | head -n1 || true)
+  [[ -n $var ]] && [[ $(od -An -tu1 -j4 -N1 "$var" 2>/dev/null | tr -d ' ') == 1 ]]
+}
+
+other_gpu() {
+  lspci_out | grep -E 'VGA compatible controller|3D controller|Display controller' | grep -qv 'NVIDIA'
+}
+
+package_for() {
+  case $1 in
+    g07) echo "$G07" ;;
+    g06) echo "$G06" ;;
+    *) echo "" ;;
+  esac
+}
+
+installed_meta() {
+  local p
+  for p in "$G07" "$G06"; do
+    rpm -q --quiet "$p" && { echo "$p"; return; }
+  done
+  echo ""
+}
+
+# ---------- Etapas ----------
+
+snapshot() {
+  if command -v snapper >/dev/null && snapper --no-dbus list-configs 2>/dev/null | grep -q '^root '; then
+    local n
+    n=$(snapper --no-dbus create --type single --cleanup-algorithm number --print-number \
+      --description "antes do driver NVIDIA ($1)" --userdata important=yes)
+    echo "instantâneo $n criado"
+  else
+    echo "aviso: Snapper sem configuração root; seguindo sem instantâneo"
+  fi
+}
+
+ensure_repo() {
+  if "${ZYPPER[@]}" repos "$REPO_ALIAS" >/dev/null 2>&1; then
+    echo "repositório $REPO_ALIAS já existe"
+  else
+    "${ZYPPER[@]}" addrepo --refresh "$REPO_URL" "$REPO_ALIAS"
+  fi
+}
+
+# Baixa a chave do repositório, confere a impressão digital e só então a
+# importa no RPM. Nunca usa --gpg-auto-import-keys.
+verify_key() {
+  local tmp got
+  tmp=$(mktemp -d)
+  trap 'rm -rf "$tmp"' RETURN
+  curl --fail --silent --show-error --location --proto '=https' \
+    -o "$tmp/key.asc" "$REPO_URL/repodata/repomd.xml.key"
+  got=$(gpg --homedir "$tmp" --batch --with-colons --import-options show-only --import "$tmp/key.asc" 2>/dev/null |
+    awk -F: '$1 == "fpr" { print $10; exit }')
+  echo "impressão digital: ${got:-nenhuma}"
+  [[ $got == "$KEY_FINGERPRINT" ]] || fail 5 "A chave do repositório da NVIDIA não confere com a publicada no guia."
+  rpm --import "$tmp/key.asc"
+  "${ZYPPER[@]}" refresh "$REPO_ALIAS"
+}
+
+power_management() {
+  local gen=$1 chip=$2 kind=$3
+  # Notebooks híbridos anteriores à Ampere: passo manual do guia.
+  if [[ $gen != legacy && ${chip:0:2} =~ ^(TU|GM|GP|GV)$ ]] && { [[ $kind == 3d ]] || other_gpu; }; then
+    echo "options nvidia NVreg_DynamicPowerManagement=0x02" >"$PM_CONF"
+    echo "gráfico híbrido anterior à Ampere: $PM_CONF criado"
+  else
+    echo "gerenciamento de energia: nada a fazer"
+  fi
+}
+
+schedule_test() {
+  install -d -m 0755 "$STATE_DIR"
+  cat /proc/sys/kernel/random/boot_id >"$PENDING_TEST"
+  echo "teste agendado para depois do reinício"
+}
+
+# ---------- Ações ----------
+
+do_install() {
+  local gen chip kind pkg
+  step 1 "Identificando a placa"
+  read -r gen chip kind < <(detect)
+  echo "placa: $chip ($kind) → $gen"
+  case $gen in
+    none) fail 3 "Nenhuma placa NVIDIA encontrada." ;;
+    legacy) fail 3 "Placa Kepler ou anterior: não há driver NVIDIA para o Leap 16.1." ;;
+  esac
+  if [[ $gen == g06 ]] && secure_boot; then
+    fail 3 "O driver G06 não funciona com o Secure Boot ligado no Lyra OS. Desligue o Secure Boot no firmware e tente de novo."
+  fi
+  pkg=$(package_for "$gen")
+
+  step 2 "Criando ponto de restauração"
+  snapshot install
+
+  step 3 "Adicionando repositório da NVIDIA"
+  ensure_repo
+
+  step 4 "Conferindo a chave de assinatura"
+  verify_key
+
+  step 5 "Instalando o driver ${gen^^}"
+  if rpm -q --quiet lyra-nvidia || [[ -e /etc/zypp/repos.d/lyra-nvidia.repo ]]; then
+    # Migração da integração antiga do Vega (remove-nvidia-integration),
+    # numa única transação, como no design validado em 31/10/2026.
+    "${ZYPPER[@]}" removerepo lyra-nvidia || true
+    "${ZYPPER[@]}" install --allow-downgrade --allow-vendor-change "$pkg" \
+      -lyra-nvidia -nvidia-open -nvidia-open-driver-G07-signed-cuda-kmp-default
+  else
+    "${ZYPPER[@]}" install "$pkg"
+  fi
+  power_management "$gen" "$chip" "$kind"
+
+  step 6 "Agendando o teste após reiniciar"
+  schedule_test
+}
+
+do_update() {
+  [[ -n $(installed_meta) ]] || fail 3 "O driver NVIDIA não está instalado."
+  step 1 "Criando ponto de restauração"
+  snapshot update
+  step 2 "Atualizando o repositório da NVIDIA"
+  "${ZYPPER[@]}" refresh "$REPO_ALIAS"
+  step 3 "Instalando a versão nova"
+  "${ZYPPER[@]}" update --repo "$REPO_ALIAS"
+  step 4 "Agendando o teste após reiniciar"
+  schedule_test
+}
+
+do_reinstall() {
+  local meta pkgs
+  meta=$(installed_meta)
+  [[ -n $meta ]] || fail 3 "O driver NVIDIA não está instalado."
+  step 1 "Criando ponto de restauração"
+  snapshot reinstall
+  step 2 "Reinstalando os pacotes do driver"
+  mapfile -t pkgs < <(rpm -qa --qf '%{NAME}\n' | grep -E '^(nvidia-|libnvidia-)' | sort -u)
+  "${ZYPPER[@]}" install --force "${pkgs[@]}"
+  step 3 "Agendando o teste após reiniciar"
+  schedule_test
+}
+
+do_remove() {
+  local meta
+  meta=$(installed_meta)
+  [[ -n $meta ]] || fail 3 "O driver NVIDIA não está instalado."
+  step 1 "Criando ponto de restauração"
+  snapshot remove
+  step 2 "Removendo o driver"
+  "${ZYPPER[@]}" remove --clean-deps "$meta"
+  step 3 "Removendo o repositório da NVIDIA"
+  "${ZYPPER[@]}" removerepo "$REPO_ALIAS" || true
+  rm -f -- "$PM_CONF" "$PENDING_TEST"
+  echo "a placa volta ao driver livre nouveau no próximo reinício"
+}
+
+[[ $# -eq 1 ]] || usage
+action=$1
+
+case $action in
+  plan)
+    # Sem privilégio: usado pelos testes para conferir a tabela de gerações.
+    detect
+    exit 0
+    ;;
+  install | update | reinstall | remove) ;;
+  *) usage ;;
+esac
+
+trap 'printf "@error %s\n" "Falhou um comando do sistema. Veja os detalhes técnicos."' ERR
+
+[[ $EUID -eq 0 ]] || fail 4 "Precisa ser executado como root, pelo pkexec."
+
+"do_$action"
+echo "@done"

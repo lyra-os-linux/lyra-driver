@@ -1,0 +1,11 @@
+-------------------------------------------------------------------
+Mon Nov 16 2026 - Rodrigo Brito <183213+britors@users.noreply.github.com>
+
+- 0.1.0: first package. Detects the NVIDIA card and the driver branch
+  from the forum guide (G07 for Turing and newer, G06 for Maxwell,
+  Pascal and Volta), installs it from the official NVIDIA repository
+  after verifying the signing key, tests it after the reboot and can
+  update, reinstall or remove it. Privileged actions run through
+  lyra-driver-helper with pkexec (polkit org.lyraos.driver.manage).
+  Refuses G06 with Secure Boot on; migrates the old lyra-nvidia
+  integration in one transaction.

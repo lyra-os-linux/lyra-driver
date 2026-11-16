@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Drivers
+Name[pt_BR]=Drivers
+Comment=Install and maintain third-party drivers
+Comment[pt_BR]=Instalar e manter drivers de terceiros
+Exec=lyra-driver
+Icon=org.lyraos.LyraDriver
+Categories=System;Settings;HardwareSettings;
+Keywords=nvidia;driver;gpu;placa de vídeo;
+StartupWMClass=org.lyraos.LyraDriver

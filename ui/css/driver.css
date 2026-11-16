@@ -1,0 +1,48 @@
+/* Lyra Driver: só o que o vega.css não tem. Ícones em sprite SVG porque o
+   protótipo não usa o icons.js do Vega. */
+[hidden] { display: none !important; }
+.sprite { position: absolute; }
+svg.i { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+svg.i.xs { width: 13px; height: 13px; stroke-width: 2.2; }
+svg.i.sm { width: 15px; height: 15px; }
+svg.i.lg { width: 28px; height: 28px; }
+svg.i.xl { width: 40px; height: 40px; stroke-width: 2.2; }
+
+a.nav-item, a.list-row, a.btn { text-decoration: none; color: inherit; }
+a.btn.primary { color: var(--accent-fg); }
+a.list-row { display: flex; }
+.hero a.btn { color: #1e1e22; }
+
+.page[hidden], .stage[hidden] { display: none; }
+.page > .section:first-child { margin-top: 14px; }
+.row-flex.end { justify-content: flex-end; }
+.stage { display: flex; flex-direction: column; gap: var(--gap); animation: page-in 0.25s var(--ease); }
+.danger-text { color: var(--red); }
+.stat-value.ok { color: var(--green); }
+.mok { font-family: var(--mono); font-weight: 700; padding: 1px 7px; border-radius: 5px; background: var(--fill-2); }
+
+/* Etapas do assistente */
+.stage-steps { display: flex; gap: 4px; padding: 3px; border-radius: 9px; background: var(--fill); counter-reset: s; }
+.stage-steps span { counter-increment: s; display: inline-flex; align-items: center; gap: 7px; height: 30px; padding: 0 12px 0 6px; border-radius: 7px; font-size: 13.5px; font-weight: 600; color: var(--fg-3); }
+.stage-steps span::before { content: counter(s); width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font-size: 11.5px; background: var(--fill-2); }
+.stage-steps span.now { background: var(--card); color: var(--fg); box-shadow: 0 1px 3px rgb(0 0 6 / 0.12), 0 0 0 1px var(--line); }
+.stage-steps span.now::before { background: var(--accent); color: var(--accent-fg); }
+.stage-steps span.past { color: var(--fg-2); }
+.stage-steps span.past::before { content: "✓"; background: var(--green-bg); color: var(--green); }
+
+.progress-card { display: flex; flex-direction: column; gap: 12px; }
+.list-row.step .title { font-weight: 500; color: var(--fg-3); }
+.list-row.step.now .title { color: var(--fg); font-weight: 600; }
+.list-row.step.now .lead { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); }
+.list-row.step.done .title { color: var(--fg); }
+.list-row.step.done .lead { background: var(--green-bg); color: var(--green); }
+
+/* Problemas */
+.search-box { min-width: 260px; }
+.list-detail ol { margin: 0 0 12px; padding-left: 18px; display: grid; gap: 4px; }
+.list-detail p { margin-bottom: 12px; }
+.list-detail > :last-child { margin-bottom: 0; }
+
+/* Título e subtítulo das linhas são <span>: no Vega são blocos (divs). */
+.list-row .title, .list-row .subtitle { display: block; }
+.list-row .subtitle { margin-top: 2px; }
