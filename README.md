@@ -3,7 +3,8 @@
 Instala, testa e mantém drivers de terceiros no Lyra OS, começando pelo driver
 NVIDIA (pacotes oficiais da NVIDIA para o openSUSE Leap 16.1).
 
-**Estado:** em desenvolvimento, ainda sem pacote RPM.
+**Estado:** em desenvolvimento; a versão 0.1.0 é publicada no OBS como RPM
+(`home:rodrigosbrito:lyra`).
 
 - `src-tauri/src/detect.rs`: detecção sem privilégio (placa, ramo G07/G06,
   Secure Boot, notebook híbrido, integração antiga `lyra-nvidia`).
